@@ -1,3 +1,3 @@
-INSERT INTO article (title, content, email, phone, author, password, created_at, updated_at) VALUES ('제목 1', '내용 1', 'email123@gmail.com', '010-1234-5678', '작성자 1', 'AbCd12345@!', NOW(), NOW());
+INSERT INTO article (title, content, email, phone, author, password, created_at, updated_at) VALUES ('제목 1', '내용 1', 'email123@gmail.com', '010-1234-5678', '작성자 1', 'AbCd12345@!', '2024-04-24T09:16:03.815+00:00', NOW());
 INSERT INTO article (title, content, email, phone, author, password, created_at, updated_at) VALUES ('제목 2', '내용 2', 'email123@gmail.com', '010-1234-5678', '작성자 2', 'AbCd12345@!', NOW(), NOW());
 INSERT INTO article (title, content, email, phone, author, password, created_at, updated_at) VALUES ('제목 3', '내용 3', 'email123@gmail.com', '010-1234-5678', '작성자 3', 'AbCd12345@!', NOW(), NOW());

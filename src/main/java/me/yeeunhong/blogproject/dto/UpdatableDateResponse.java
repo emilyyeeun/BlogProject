@@ -1,7 +1,8 @@
 package me.yeeunhong.blogproject.dto;
 
-import me.yeeunhong.blogproject.domain.Article;
+import lombok.Getter;
 
+@Getter
 public class UpdatableDateResponse {
     private String message;
     public UpdatableDateResponse(String message) {

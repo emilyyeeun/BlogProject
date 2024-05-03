@@ -1,2 +1,2 @@
-# BlogProject
-Spring Practice
+<스프링 부트 3 백엔드 개발자 되기>
+6장과 7장 블로그 만들기 실습

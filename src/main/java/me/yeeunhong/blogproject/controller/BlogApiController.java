@@ -66,8 +66,9 @@ public class BlogApiController {
             return ResponseEntity.ok()
                     .body(new ArticleResponse(updatedArticle));
         } else if (daysToUpdate == 9) {
+            Article updatedArticle = blogService.update(id, request);
             return ResponseEntity.ok()
-                    .body(new UpdateArticleResponse(articleToUpdate));
+                    .body(new UpdateArticleResponse(updatedArticle));
         } else {
             return ResponseEntity.ok().body(new ArticleResponse(articleToUpdate));
         }
