@@ -18,6 +18,7 @@ public class BlogApiController {
     private final BlogService blogService;
 
     // controller의 정렬은 get -> post -> put -> delete 순
+    // 팀마다 정렬방식은 다를 수 있음
     @GetMapping("/api/articles")
     public ResponseEntity<List<ArticleResponse>> findAllArticles() {
         // Get 요청이 오면 글 전체를 조회하는 findAll() 메서드를 호출한 다음 응답용 객체인 articleReponse로 파싱해 객체에 담아 클라이언트에게 전송
@@ -46,6 +47,8 @@ public class BlogApiController {
         return ResponseEntity.ok().body(new UpdatableDateResponse(message));
     }
 
+
+
     // HTTP 메서드가 POST일 때 전달받은 URL과 동일하면 메서드로 매핑
     @PostMapping("/api/articles")
     // @RequestBody로 요청 본문 값 매핑
@@ -62,14 +65,17 @@ public class BlogApiController {
         Article articleToUpdate = blogService.findById(id);
         long daysToUpdate = blogService.numDaysFromUpdated(articleToUpdate);
         if (daysToUpdate < 9) {
+            // 생성일 기준으로 10일이 되지 않았다면 수정 가능
             Article updatedArticle = blogService.update(id, request);
             return ResponseEntity.ok()
                     .body(new ArticleResponse(updatedArticle));
         } else if (daysToUpdate == 9) {
+            // 생성일 9일째 되었을 때 하루가 지나면 수정을 못한다는 알람을 처리
             Article updatedArticle = blogService.update(id, request);
             return ResponseEntity.ok()
                     .body(new UpdateArticleResponse(updatedArticle));
         } else {
+            // 생성일 10일 이상이 되었다면 수정 불가,
             return ResponseEntity.ok().body(new ArticleResponse(articleToUpdate));
         }
     }

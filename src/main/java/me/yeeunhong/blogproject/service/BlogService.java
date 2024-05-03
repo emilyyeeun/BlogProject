@@ -6,6 +6,8 @@ import me.yeeunhong.blogproject.dto.AddArticleRequest;
 import me.yeeunhong.blogproject.dto.UpdateArticleRequest;
 import me.yeeunhong.blogproject.repository.BlogRepository;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,6 +101,13 @@ public class BlogService {
         return blogRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("not found: " + id));
     }
+
+    // title 기준으로 검색이 되도록 구현
+    @Transactional
+    public Page<Article> articleSearchList(String keyword, Pageable pageable) {
+        return blogRepository.findByTitleContaining(keyword, pageable);
+    }
+
 
     @Transactional
     public Article softDelete(long id) {

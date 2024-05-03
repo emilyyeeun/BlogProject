@@ -36,7 +36,7 @@ public class BlogApiControllerTest {
 
     @BeforeEach
     public void setUp() {
-        blogRepository.deleteAll();
+
     }
 
     private Article createTestArticle(String title, String content, String email, String phoneNum, String author, String password) {
