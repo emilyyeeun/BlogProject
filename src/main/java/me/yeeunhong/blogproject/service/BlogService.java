@@ -6,10 +6,7 @@ import me.yeeunhong.blogproject.dto.*;
 import me.yeeunhong.blogproject.repository.BlogRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor // final이 붙거나 @NotNull이 붙은 필드의 생성자 추가
 @Service // 빈으로 등록
@@ -30,14 +27,14 @@ public class BlogService {
 
     public List<ArticleResponse> findArticlesWithParams(String sortingTypeInput, String title) {
        if ((title != null) & (sortingTypeInput != null)) {
-           if (sortingTypeInput.contains("asc")) {
+           if (sortingTypeInput.contains("ASC")) {
                return getArticlesByTitleSorted(title, false);
            } else {
                // default descending
                return getArticlesByTitleSorted(title, true);
            }
        } else {
-           if (sortingTypeInput.contains("asc")) {
+           if (sortingTypeInput.contains("ASC")) {
                return getArticlesOrderBy(false);
            } else {
                // default descending
@@ -62,6 +59,7 @@ public class BlogService {
             return blogRepository.findAllByTitleContainsOrderByCreatedAtAsc(title).stream().filter(i -> i.getDeletedAt() == null).map(ArticleResponse::new).toList();
         }
     }
+
 
     // JPA의 findById() 메서드를 사용해 ID를 받아 엔티티를 조회하고 없으면 illegalArgumentException 예외 발생
     public Article findById(long id) {

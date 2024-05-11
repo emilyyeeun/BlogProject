@@ -21,7 +21,7 @@ public class BlogApiController {
     private final BlogFactory blogFactory;
 
     @GetMapping("/api/articles")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles(@RequestParam(required = false, defaultValue = "createdAt", value = "orderby") String sortingTypeInput,
+    public ResponseEntity<List<ArticleResponse>> findAllArticles(@RequestParam(required = false, defaultValue = "DESC", value = "sort") String sortingTypeInput,
                                                                  @RequestParam(required = false, value = "title") String title) {
         return ResponseEntity.ok().body(blogService.findArticlesWithParams(sortingTypeInput, title).stream().toList());
     }
@@ -41,6 +41,8 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(updateArticleResponse);
     }
+
+
 
 
 
