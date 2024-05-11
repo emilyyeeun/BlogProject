@@ -5,30 +5,25 @@ import lombok.RequiredArgsConstructor;
 import me.yeeunhong.blogproject.DeleteType;
 import me.yeeunhong.blogproject.domain.Article;
 import me.yeeunhong.blogproject.dto.*;
+import me.yeeunhong.blogproject.service.BlogFactory;
 import me.yeeunhong.blogproject.service.BlogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController // HTTP Response Body에 객체 데이터를 JSON 형식으로 반환하는 컨트롤러
 public class BlogApiController {
     private final BlogService blogService;
+    private final BlogFactory blogFactory;
 
-    // controller의 정렬은 get -> post -> put -> delete 순
-    // 팀마다 정렬방식은 다를 수 있음
     @GetMapping("/api/articles")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles() {
-        // Get 요청이 오면 글 전체를 조회하는 findAll() 메서드를 호출한 다음 응답용 객체인 articleReponse로 파싱해 객체에 담아 클라이언트에게 전송
-        List<ArticleResponse> articles = blogService.findAll()
-                .stream()
-                .map(ArticleResponse::new)
-                .toList();
-        // ResponseEntity를 쓰는 경우 1) 규칙성 2) HTTP status에 대해 바로바로 사용이 가능하다
-        return ResponseEntity.ok()
-                .body(articles);
+    public ResponseEntity<List<ArticleResponse>> findAllArticles(@RequestParam(required = false, defaultValue = "createdAt", value = "orderby") String sortingTypeInput,
+                                                                 @RequestParam(required = false, value = "title") String title) {
+        return ResponseEntity.ok().body(blogService.findArticlesWithParams(sortingTypeInput, title).stream().toList());
     }
 
     @GetMapping("/api/articles/{id}")
@@ -40,11 +35,11 @@ public class BlogApiController {
 
     // 게시글 상세보기
     @GetMapping("/api/articles/details/{id}")
-    public ResponseEntity<UpdatableDateResponse> getArticleDetails(@PathVariable long id) {
-        Article article = blogService.findById(id);
-        String message = blogService.getUpdateMessage(article);
+    public ResponseEntity<UpdateArticleResponse> getArticleDetails(@PathVariable long id) {
+        UpdateArticleResponse updateArticleResponse = blogService.getUpdateMessage(id);
         // 수정 가능일을 현재날짜 기준으로 계산해서 같이 보여주기
-        return ResponseEntity.ok().body(new UpdatableDateResponse(message));
+        return ResponseEntity.ok()
+                .body(updateArticleResponse);
     }
 
 
@@ -54,7 +49,7 @@ public class BlogApiController {
     // @RequestBody로 요청 본문 값 매핑
     // @Valid를 통해 입력 파라미터의 유효성 검증
     public ResponseEntity<ArticleResponse> addArticle(@Valid @RequestBody AddArticleRequest request) {
-        Article savedArticle = blogService.save(request);
+        Article savedArticle = blogFactory.save(request);
         // 요청한 자원이 성공정으로 생성되었으며 저장된 블로그 글 정보를 응답 객체에 담아 전송 (201)
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ArticleResponse(savedArticle));
@@ -62,22 +57,8 @@ public class BlogApiController {
 
     @PutMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponseInterface> updateArticle(@PathVariable long id, @RequestBody UpdateArticleRequest request) {
-        Article articleToUpdate = blogService.findById(id);
-        long daysToUpdate = blogService.numDaysFromUpdated(articleToUpdate);
-        if (daysToUpdate < 9) {
-            // 생성일 기준으로 10일이 되지 않았다면 수정 가능
-            Article updatedArticle = blogService.update(id, request);
-            return ResponseEntity.ok()
-                    .body(new ArticleResponse(updatedArticle));
-        } else if (daysToUpdate == 9) {
-            // 생성일 9일째 되었을 때 하루가 지나면 수정을 못한다는 알람을 처리
-            Article updatedArticle = blogService.update(id, request);
-            return ResponseEntity.ok()
-                    .body(new UpdateArticleResponse(updatedArticle));
-        } else {
-            // 생성일 10일 이상이 되었다면 수정 불가,
-            return ResponseEntity.ok().body(new ArticleResponse(articleToUpdate));
-        }
+        ArticleResponseInterface updateArticle = blogService.updateArticleWithValidation(id, request);
+        return ResponseEntity.ok().body(updateArticle);
     }
 
     // soft delete & hard delete
@@ -91,7 +72,6 @@ public class BlogApiController {
             blogService.hardDelete(id);
             return ResponseEntity.ok().build();
         }
-
     }
 }
 

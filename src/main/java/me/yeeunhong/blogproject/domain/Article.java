@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 @Entity(name="ARTICLE")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -54,6 +57,18 @@ public class Article extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.author = author;
         this.password = password;
+    }
+
+    public long numDaysFromUpdated() {
+        // 작성일자가 10일이 넘었는지 확인
+        return Duration.between(this.getCreatedAt(), LocalDateTime.now()).toDays();
+    }
+
+    public String getUpdateMessage() {
+        // 수정 가능일을 현재날짜 기준으로 계산해서 같이 보여주기
+        LocalDateTime updatableDays = this.getCreatedAt().plusDays(9);
+        return "오늘 날짜는 " + LocalDateTime.now() + "입니다."
+                + "수정 가능일은 " + updatableDays + "까지입니다.";
     }
 
 

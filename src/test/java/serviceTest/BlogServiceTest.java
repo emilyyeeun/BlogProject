@@ -52,7 +52,7 @@ public class BlogServiceTest {
         when(blogRepository.save(any(Article.class))).thenReturn(article);
 
         // when (함수 실제 호출)
-        Article savedArticle = blogService.save(request);
+        Article savedArticle = blogFactory.save(request);
 
         // then (동작 검증)
         assertThat(savedArticle).isNotNull();
