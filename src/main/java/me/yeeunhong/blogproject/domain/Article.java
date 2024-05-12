@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity(name="ARTICLE")
@@ -66,8 +67,10 @@ public class Article extends BaseEntity {
 
     public String getUpdateMessage() {
         // 수정 가능일을 현재날짜 기준으로 계산해서 같이 보여주기
-        LocalDateTime updatableDays = this.getCreatedAt().plusDays(9);
-        return "오늘 날짜는 " + LocalDateTime.now() + "입니다."
+        LocalDateTime creationTime = this.getCreatedAt();
+        LocalDate updatableDays = creationTime.toLocalDate().plusDays(9);
+
+        return "오늘 날짜는 " + LocalDate.now() + "입니다. "
                 + "수정 가능일은 " + updatableDays + "까지입니다.";
     }
 

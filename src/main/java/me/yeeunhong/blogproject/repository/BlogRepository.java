@@ -8,7 +8,6 @@ import java.util.*;
 
 // 엔티티 Article과 엔티티의 PK 타입 Long
 public interface BlogRepository extends JpaRepository <Article, Long> {
-
     List<Article> findAllByOrderByCreatedAtDesc();
     List<Article> findAllByOrderByCreatedAtAsc();
 

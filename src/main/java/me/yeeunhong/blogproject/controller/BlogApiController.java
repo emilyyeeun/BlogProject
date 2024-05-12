@@ -26,7 +26,7 @@ public class BlogApiController {
      */
     @GetMapping("/api/articles")
     public ResponseEntity<Page<ArticleResponse>> getArticlesListOrPage(@RequestParam(required = false, defaultValue = "pagination", value = "page") String page,
-                                                                     @RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
+                                                                     @RequestParam(required = false, defaultValue = "0", value = "pageNo") int pageNo,
                                                                      @RequestParam(required = false, defaultValue = "DESC", value = "sort") String sortingType,
                                                                      @RequestParam(required = false, value = "title") String title) {
         return (page.equals("page")) ? ResponseEntity.ok().body(blogService.getArticlesPage(pageNo, sortingType, title))
@@ -75,9 +75,9 @@ public class BlogApiController {
     /*
     DELETE article: 블로그 글을 soft delete하거나 hard delete 한다.
      */
-    @DeleteMapping("/api/articles/{deleteType}/{id}")
+    @DeleteMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponse> deleteArticle(@RequestParam("deleteType") DeleteType deleteType,
-                                                         @RequestParam("id") long id) {
+                                                         @PathVariable long id) {
         if (deleteType == DeleteType.SOFT_DELETE) {
             Article article = blogService.softDelete(id);
             return ResponseEntity.ok().body(new ArticleResponse(article));

@@ -1,9 +1,10 @@
-package serviceTest;
+package me.yeeunhong.blogproject.serviceTest;
 
 import me.yeeunhong.blogproject.domain.Article;
 import me.yeeunhong.blogproject.dto.AddArticleRequest;
 import me.yeeunhong.blogproject.dto.UpdateArticleRequest;
 import me.yeeunhong.blogproject.repository.BlogRepository;
+import me.yeeunhong.blogproject.service.BlogFactory;
 import me.yeeunhong.blogproject.service.BlogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +32,9 @@ public class BlogServiceTest {
     // 의존성 주입
     @InjectMocks
     private BlogService blogService;
+
+    @InjectMocks
+    private BlogFactory blogFactory;
 
     @BeforeEach
     void setUp() {
@@ -81,7 +85,7 @@ public class BlogServiceTest {
 
 
         // then (동작 검증)
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogService.save(request));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogFactory.save(request));
         assertEquals("title is longer than 200 characters", exception.getMessage());
     }
 
@@ -96,7 +100,7 @@ public class BlogServiceTest {
 
 
         // then (동작 검증)
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogService.save(request));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogFactory.save(request));
         assertEquals("content is longer than 1000 characters", exception.getMessage());
     }
 
@@ -110,7 +114,7 @@ public class BlogServiceTest {
 
 
         // then (동작 검증)
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogService.save(request));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogFactory.save(request));
         assertEquals("wrong email format", exception.getMessage());
     }
 
@@ -124,7 +128,7 @@ public class BlogServiceTest {
 
 
         // then (동작 검증)
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogService.save(request));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogFactory.save(request));
         assertEquals("wrong phone number format", exception.getMessage());
     }
 
@@ -138,7 +142,7 @@ public class BlogServiceTest {
         Article article = request.toEntity();
 
         // then (동작 검증)
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogService.save(request));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> blogFactory.save(request));
         assertEquals("wrong password format", exception.getMessage());
     }
 
@@ -268,7 +272,7 @@ public class BlogServiceTest {
                 request.getAuthor(), request.getPassword());
 
         // when
-        Article updatedArticle = blogService.update(articleId, request);
+        Article updatedArticle = blogService.update(article, request);
 
         // then
         assertThat(article.getTitle()).isEqualTo(updatedArticle.getTitle());
@@ -285,12 +289,15 @@ public class BlogServiceTest {
         // given
         UpdateArticleRequest request = new UpdateArticleRequest("Test Title", "Test Content",
                 "testemail123@gmail.com", "010-1111-2222", "test author", "AbCd12345@!");
+        Article article = new Article("Test Title1", "Test Content1",
+                "testemail123@gmail.com", "010-1111-2222", "test author", "AbCd12345@!");
+        blogRepository.save(article);
         Long id = 100L;
         // stub
         when(blogRepository.findById(id)).thenThrow(IllegalArgumentException.class);
 
         // when/then
-        assertThrows(IllegalArgumentException.class, () -> blogService.update(id, request));
+        assertThrows(IllegalArgumentException.class, () -> blogService.update(article, request));
     }
 
 }

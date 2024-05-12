@@ -1,4 +1,4 @@
-package repositoryTest;
+package me.yeeunhong.blogproject.repositoryTest;
 
 import me.yeeunhong.blogproject.domain.Article;
 import me.yeeunhong.blogproject.repository.BlogRepository;
