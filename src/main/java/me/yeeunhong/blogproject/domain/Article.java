@@ -71,8 +71,6 @@ public class Article extends BaseEntity {
                 + "수정 가능일은 " + updatableDays + "까지입니다.";
     }
 
-
-
 //    // NoArgsConsturctor로 대체
 //    protected Article() {
 //        // 기본 생성자

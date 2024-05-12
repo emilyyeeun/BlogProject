@@ -21,6 +21,7 @@ public class UpdateArticleResponse implements ArticleResponseInterface {
             this.phoneNumber = article.getPhoneNumber();
             this.author = article.getAuthor();
             this.password = article.getPassword();
+            // ArticleResponse와 달리 UpdateArticleResponse는 message를 함께 출력한다.
             this.message = message;
     }
 }
