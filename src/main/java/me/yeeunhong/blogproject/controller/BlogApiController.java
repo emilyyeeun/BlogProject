@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @RestController // HTTP Response Body에 객체 데이터를 JSON 형식으로 반환하는 컨트롤러
 public class BlogApiController {
@@ -22,7 +20,7 @@ public class BlogApiController {
     private final BlogFactory blogFactory;
 
     /*
-    pagination으로 구현한 게시글 가져오기
+    GET articles: pagination으로 구현한 게시글 가져오기
     생성일 기준으로 title 검색하여 유사한 게시글이 있다면 오름차순/내림차순으로 정렬하여 가져온다.
     list -> page 연습을 위해 두 메서드 분리
      */
@@ -35,6 +33,9 @@ public class BlogApiController {
                 : ResponseEntity.ok().body(new PageImpl<>(blogService.findArticlesWithParams(sortingType, title)));
     }
 
+    /*
+    GET article: 특정 id를 가진 게시글을 가져온다.
+     */
     @GetMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable long id) {
         Article article = blogService.findById(id);
@@ -42,34 +43,38 @@ public class BlogApiController {
                 .body(new ArticleResponse(article));
     }
 
-    // 게시글 상세보기
+    /*
+    GET details: 수정 가능일을 현재날짜 기준으로 계산하여 같이 보여준다.
+     */
     @GetMapping("/api/articles/details/{id}")
     public ResponseEntity<UpdateArticleResponse> getArticleDetails(@PathVariable long id) {
         UpdateArticleResponse updateArticleResponse = blogService.getUpdateMessage(id);
-        // 수정 가능일을 현재날짜 기준으로 계산해서 같이 보여주기
         return ResponseEntity.ok()
                 .body(updateArticleResponse);
     }
 
-
-    // HTTP 메서드가 POST일 때 전달받은 URL과 동일하면 메서드로 매핑
+    /*
+    POST article: 블로그 글을 업로드한다.
+     */
     @PostMapping("/api/articles")
-    // @RequestBody로 요청 본문 값 매핑
-    // @Valid를 통해 입력 파라미터의 유효성 검증
     public ResponseEntity<ArticleResponse> addArticle(@Valid @RequestBody AddArticleRequest request) {
         Article savedArticle = blogFactory.save(request);
-        // 요청한 자원이 성공정으로 생성되었으며 저장된 블로그 글 정보를 응답 객체에 담아 전송 (201)
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ArticleResponse(savedArticle));
     }
 
+    /*
+    PUT article: 블로그 글을 수정한다.
+     */
     @PutMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponseInterface> updateArticle(@PathVariable long id, @RequestBody UpdateArticleRequest request) {
         ArticleResponseInterface updateArticle = blogService.updateArticleWithValidation(id, request);
         return ResponseEntity.ok().body(updateArticle);
     }
 
-    // soft delete & hard delete
+    /*
+    DELETE article: 블로그 글을 soft delete하거나 hard delete 한다.
+     */
     @DeleteMapping("/api/articles/{deleteType}/{id}")
     public ResponseEntity<ArticleResponse> deleteArticle(@RequestParam("deleteType") DeleteType deleteType,
                                                          @RequestParam("id") long id) {
