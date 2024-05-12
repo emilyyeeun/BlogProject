@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import me.yeeunhong.blogproject.domain.Article;
 import me.yeeunhong.blogproject.dto.*;
 import me.yeeunhong.blogproject.repository.BlogRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -58,6 +62,15 @@ public class BlogService {
         } else {
             return blogRepository.findAllByTitleContainsOrderByCreatedAtAsc(title).stream().filter(i -> i.getDeletedAt() == null).map(ArticleResponse::new).toList();
         }
+    }
+
+    // pagination 구현
+    public Page<ArticleResponse> getArticlesPage(int pageNo, String sortingType, String title) {
+        Pageable pageable = (sortingType.equals("ASC")) ?
+                PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.ASC, "createdAt"))
+                : PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return blogRepository.findAllByTitleContains(title, pageable).map(ArticleResponse::new);
     }
 
 

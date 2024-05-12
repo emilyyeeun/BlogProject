@@ -7,6 +7,7 @@ import me.yeeunhong.blogproject.domain.Article;
 import me.yeeunhong.blogproject.dto.*;
 import me.yeeunhong.blogproject.service.BlogFactory;
 import me.yeeunhong.blogproject.service.BlogService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +21,18 @@ public class BlogApiController {
     private final BlogService blogService;
     private final BlogFactory blogFactory;
 
+    // pagination 없이 구현
+//    @GetMapping("/api/articles")
+//    public ResponseEntity<List<ArticleResponse>> findAllArticles(@RequestParam(required = false, defaultValue = "DESC", value = "sort") String sortingTypeInput,
+//                                                                 @RequestParam(required = false, value = "title") String title) {
+//        return ResponseEntity.ok().body(blogService.findArticlesWithParams(sortingTypeInput, title).stream().toList());
+//    }
+
     @GetMapping("/api/articles")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles(@RequestParam(required = false, defaultValue = "DESC", value = "sort") String sortingTypeInput,
-                                                                 @RequestParam(required = false, value = "title") String title) {
-        return ResponseEntity.ok().body(blogService.findArticlesWithParams(sortingTypeInput, title).stream().toList());
+    public ResponseEntity<Page<ArticleResponse>> getArticlesPage(@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
+                                                 @RequestParam(required = false, defaultValue = "DESC", value = "sort") String sortingType,
+                                                 @RequestParam(required = false, value = "title") String title) {
+        return ResponseEntity.ok().body(blogService.getArticlesPage(pageNo, sortingType, title));
     }
 
     @GetMapping("/api/articles/{id}")
@@ -41,9 +50,6 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(updateArticleResponse);
     }
-
-
-
 
 
     // HTTP 메서드가 POST일 때 전달받은 URL과 동일하면 메서드로 매핑
