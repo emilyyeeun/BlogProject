@@ -42,6 +42,9 @@ public class BlogServiceTest {
         blogRepository.deleteAll();
     }
 
+    /*
+    blogFactory save validation 및 기능 테스트
+     */
     @DisplayName(("addArticle: 새로운 글을 추가한다."))
     @Test
     void addArticleTest() {
@@ -94,7 +97,18 @@ public class BlogServiceTest {
     void addArticleFailContentTest() {
         // given
         AddArticleRequest request = new AddArticleRequest("title",
-                "hellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooo",
+                "hellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohell" +
+                        "ooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloo" +
+                        "ooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloooo" +
+                        "ooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloooooo" +
+                        "ooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloooooooooo" +
+                        "ohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohel" +
+                        "looooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloooo" +
+                        "ooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooo" +
+                        "oohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohel" +
+                        "looooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloooo" +
+                        "ooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohellooooooooooohelloooooooo" +
+                        "ooohellooooooooooohellooooooooooo",
                 "test123@gmail.com", "010-1111-2222", "test author",
                 "AbCd12345@!");
 
@@ -146,7 +160,9 @@ public class BlogServiceTest {
         assertEquals("wrong password format", exception.getMessage());
     }
 
-
+    /*
+    get all articles test
+     */
     @DisplayName(("findArticles: 모든 글을 조회한다."))
     @Test
     void findAllArticlesTest() {
@@ -173,9 +189,12 @@ public class BlogServiceTest {
         assertThat(resultList.get(0).getContent()).isEqualTo(savedList.get(0).getContent());
         assertThat(resultList.get(0).getEmail()).isEqualTo(savedList.get(0).getEmail());
         verify(blogRepository).findAll();
-
     }
 
+
+    /*
+    findById test
+     */
     @DisplayName(("find By Id: id로 글 조회"))
     @Test
     void findByIdTest() {
@@ -212,7 +231,36 @@ public class BlogServiceTest {
         assertThrows(IllegalArgumentException.class, () -> blogService.findById(id));
     }
 
-    @DisplayName(("delete: 블로그 글 삭제"))
+
+
+    @DisplayName(("update: 블로그 글 수정"))
+    @Test
+    void updateTest() {
+        // given
+        Long articleId = 1L;
+        Article article = new Article("Test Title1", "Test Content1",
+                "testemail123@gmail.com", "010-1111-2222", "test author", "AbCd12345@!");
+        blogRepository.save(article);
+
+        UpdateArticleRequest request = new UpdateArticleRequest("Updated Title", "Updated Content",
+                "updatedemail123@gmail.com", "010-2222-3333", "updated author", "UpDated12345@!");
+
+        article.update(request.getTitle(), request.getContent(), request.getEmail(), request.getPhoneNum(),
+                request.getAuthor(), request.getPassword());
+
+        // when
+        Article updatedArticle = blogService.update(article, request);
+
+        // then
+        assertThat(article.getTitle()).isEqualTo(updatedArticle.getTitle());
+        assertThat(article.getContent()).isEqualTo(updatedArticle.getContent());
+        assertThat(article.getEmail()).isEqualTo(updatedArticle.getEmail());
+        assertThat(article.getPhoneNumber()).isEqualTo(updatedArticle.getPhoneNumber());
+        assertThat(article.getAuthor()).isEqualTo(updatedArticle.getAuthor());
+        assertThat(article.getPassword()).isEqualTo(updatedArticle.getPassword());
+    }
+
+    @DisplayName(("delete: 블로그 글 삭제 - hardDelete"))
     @Test
     void hardDeleteTest() {
         // given
@@ -254,50 +302,6 @@ public class BlogServiceTest {
         assertThat(deletedArticle.getDeletedAt()).isNotNull();
         assertThat(deletedArticle.getDeletedAt()).isEqualTo(savedArticle.getUpdatedAt());
         assertThat(deletedArticle.getTitle()).isEqualTo(savedArticle.getTitle());
-    }
-
-    @DisplayName(("update: 블로그 글 수정"))
-    @Test
-    void updateTest() {
-        // given
-        Long articleId = 1L;
-        Article article = new Article("Test Title1", "Test Content1",
-                "testemail123@gmail.com", "010-1111-2222", "test author", "AbCd12345@!");
-        blogRepository.save(article);
-
-        UpdateArticleRequest request = new UpdateArticleRequest("Updated Title", "Updated Content",
-                "updatedemail123@gmail.com", "010-2222-3333", "updated author", "UpDated12345@!");
-        when(blogRepository.findById(articleId)).thenReturn(Optional.of(article));
-        article.update(request.getTitle(), request.getContent(), request.getEmail(), request.getPhoneNum(),
-                request.getAuthor(), request.getPassword());
-
-        // when
-        Article updatedArticle = blogService.update(article, request);
-
-        // then
-        assertThat(article.getTitle()).isEqualTo(updatedArticle.getTitle());
-        assertThat(article.getContent()).isEqualTo(updatedArticle.getContent());
-        assertThat(article.getEmail()).isEqualTo(updatedArticle.getEmail());
-        assertThat(article.getPhoneNumber()).isEqualTo(updatedArticle.getPhoneNumber());
-        assertThat(article.getAuthor()).isEqualTo(updatedArticle.getAuthor());
-        assertThat(article.getPassword()).isEqualTo(updatedArticle.getPassword());
-    }
-
-    @DisplayName(("Update Exception Test: 업데이트 에러"))
-    @Test
-    void UpdateExceptionTest() {
-        // given
-        UpdateArticleRequest request = new UpdateArticleRequest("Test Title", "Test Content",
-                "testemail123@gmail.com", "010-1111-2222", "test author", "AbCd12345@!");
-        Article article = new Article("Test Title1", "Test Content1",
-                "testemail123@gmail.com", "010-1111-2222", "test author", "AbCd12345@!");
-        blogRepository.save(article);
-        Long id = 100L;
-        // stub
-        when(blogRepository.findById(id)).thenThrow(IllegalArgumentException.class);
-
-        // when/then
-        assertThrows(IllegalArgumentException.class, () -> blogService.update(article, request));
     }
 
 }

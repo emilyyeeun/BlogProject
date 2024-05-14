@@ -1,5 +1,9 @@
 package me.yeeunhong.blogproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.yeeunhong.blogproject.DeleteType;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController // HTTP Response Body에 객체 데이터를 JSON 형식으로 반환하는 컨트롤러
+@Tag(name = "blogProject", description = "blogProject API")
 public class BlogApiController {
     private final BlogService blogService;
     private final BlogFactory blogFactory;
@@ -25,6 +30,11 @@ public class BlogApiController {
     list -> page 연습을 위해 두 메서드 분리
      */
     @GetMapping("/api/articles")
+    @Operation(summary = "Get articles in pages", description = "title을 검색하여 유사한 게시글이 있다면 생성일 기준 클라이언트가 입력한 정렬기준(오름차순/내림차순)에 맞추어 가져온다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "Request Parameter가 잘못 입력 되었습니다."),
+    })
     public ResponseEntity<Page<ArticleResponse>> getArticlesListOrPage(@RequestParam(required = false, defaultValue = "pagination", value = "page") String page,
                                                                      @RequestParam(required = false, defaultValue = "0", value = "pageNo") int pageNo,
                                                                      @RequestParam(required = false, defaultValue = "DESC", value = "sort") String sortingType,
