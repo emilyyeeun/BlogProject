@@ -1,4 +1,4 @@
-package me.yeeunhong.blogproject;
+package me.yeeunhong.blogproject.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
